@@ -622,24 +622,19 @@ function setQuick(days) {
   document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
   event.currentTarget.classList.add('active');
 
-  // Última y penúltima fecha disponible en los datos
-  const allDates = RAW_DIARIO.map(d => parseISODate(d.fecha)).filter(Boolean).sort((a,b)=>a-b);
-  const lastDate = allDates[allDates.length-1] || new Date();
-  const prevDate = allDates[allDates.length-2] || lastDate;
-
   if(days === 0) {
     filterFrom = null;
     filterTo   = null;
   } else if(days === 'ayer') {
-    // "Ayer" = penúltimo día disponible en los datos
-    filterFrom = new Date(prevDate); filterFrom.setHours(0,0,0,0);
-    filterTo   = new Date(prevDate); filterTo.setHours(23,59,59,0);
+    const ayer = new Date();
+    ayer.setDate(ayer.getDate() - 1);
+    filterFrom = new Date(ayer); filterFrom.setHours(0,0,0,0);
+    filterTo   = new Date(ayer); filterTo.setHours(23,59,59,0);
   } else {
-    const from = new Date(lastDate);
-    from.setDate(from.getDate() - (days - 1));
-    from.setHours(0,0,0,0);
+    const hoy  = new Date(); hoy.setHours(23,59,59,0);
+    const from = new Date(); from.setDate(from.getDate() - (days - 1)); from.setHours(0,0,0,0);
     filterFrom = from;
-    filterTo   = new Date(lastDate); filterTo.setHours(23,59,59,0);
+    filterTo   = hoy;
   }
   syncDateInputs();
   renderAll();
