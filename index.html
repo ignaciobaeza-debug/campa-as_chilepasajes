@@ -513,19 +513,17 @@ function loadFromSheets() {
     const comRows = parseCSV(comText);
     const gaRows  = parseCSV(gaText);
 
-    // ── Procesar COMISIONES ──────────────────────────────
+    // ── Procesar COMISIONES (formato agregado: una fila por fecha+campaña) ──
     const comAcc = {};
     comRows.forEach(r => {
-      const source = (r.Source||'').toLowerCase().trim();
-      if(source !== 'adwords') return;
       const fecha = (r.Fecha||'').substring(0,10);
-      const camp  = normCamp(r.Campaign||'');
-      if(!camp || camp==='-') return;
+      const camp  = normCamp(r.Campaign||r['Campaign']||'');
+      if(!fecha || !camp || camp==='-') return;
       const key = fecha+'|'+camp;
       if(!comAcc[key]) comAcc[key] = {fecha,campana:camp,venta:0,utilidad:0,transacciones:0};
       comAcc[key].venta         += parseNum(r.Venta);
       comAcc[key].utilidad      += parseNum(r.Utilidad);
-      comAcc[key].transacciones += 1;
+      comAcc[key].transacciones += parseInt(r.Transacciones||1)||1;
     });
 
     // ── Procesar GOOGLE_ADS ──────────────────────────────
