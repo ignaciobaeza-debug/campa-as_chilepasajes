@@ -916,6 +916,26 @@ function renderDiario(dias) {
 }
 
 function renderDiarioTable(data) {
+  // Totales
+  const totInv   = data.reduce((s,d)=>s+d.inversion,0);
+  const totVenta = data.reduce((s,d)=>s+d.venta,0);
+  const totUtil  = data.reduce((s,d)=>s+d.utilidad,0);
+  const totTrans = data.reduce((s,d)=>s+(d.transacciones||0),0);
+  const totClics = data.reduce((s,d)=>s+(d.clics||0),0);
+  const roasTot  = totInv > 0 ? totVenta / totInv : null;
+  const roiTot   = totInv > 0 ? totUtil  / totInv * 100 : null;
+
+  const totRow = `<tr style="border-top:2px solid var(--border2);background:rgba(255,255,255,.03);font-weight:500">
+    <td style="font-family:var(--mono);font-size:11px;color:var(--muted)">Total período</td>
+    <td class="num">${CLP(totInv)}</td>
+    <td class="num green">${CLP(totVenta)}</td>
+    <td class="num">${CLP(totUtil)}</td>
+    <td class="num ${roasTot!=null?(roasTot>=1?'green':'red'):''}" style="font-weight:700">${roasTot!=null?X(roasTot):'—'}</td>
+    <td class="num ${roiTot!=null?(roiTot>=100?'green':'red'):''}">${roiTot!=null?PCT(roiTot):'—'}</td>
+    <td class="num muted">${totTrans.toLocaleString('es-CL')}</td>
+    <td class="num muted">${totClics.toLocaleString('es-CL')}</td>
+  </tr>`;
+
   document.getElementById('tbody-diario').innerHTML = data.map(d => {
     const roas = d.roas!=null ? X(d.roas) : '—';
     const roi  = d.roi !=null ? PCT(d.roi) : '—';
@@ -931,7 +951,7 @@ function renderDiarioTable(data) {
       <td class="num muted">${d.transacciones||0}</td>
       <td class="num muted">${(d.clics||0).toLocaleString('es-CL')}</td>
     </tr>`;
-  }).join('');
+  }).join('') + totRow;
 }
 
 function sortDiario(th) {
