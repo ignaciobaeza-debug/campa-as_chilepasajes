@@ -656,11 +656,21 @@ function syncDateInputs() {
 }
 
 function applyFilter() {
-  const fEl = document.getElementById('date-from') || document.getElementById('date-from-c') || document.getElementById('date-from-d');
-  const tEl = document.getElementById('date-to')   || document.getElementById('date-to-c')   || document.getElementById('date-to-d');
-  filterFrom = fEl && fEl.value ? parseISODate(fEl.value) : null;
-  filterTo   = tEl && tEl.value ? (() => { const d=parseISODate(tEl.value); d.setHours(23,59,59,0); return d; })() : null;
+  // Leer desde el input que tenga valor — priorizar el de la página activa
+  const fromIds = ['date-from', 'date-from-c', 'date-from-d'];
+  const toIds   = ['date-to',   'date-to-c',   'date-to-d'];
+
+  // Buscar el input con valor en la página visible
+  let fromVal = '', toVal = '';
+  fromIds.forEach(id => { const el = document.getElementById(id); if(el && el.value) fromVal = el.value; });
+  toIds.forEach(id   => { const el = document.getElementById(id); if(el && el.value) toVal   = el.value; });
+
+  filterFrom = fromVal ? parseISODate(fromVal) : null;
+  filterTo   = toVal   ? (() => { const d=parseISODate(toVal); d.setHours(23,59,59,0); return d; })() : null;
+
+  // Quitar selección de quick buttons
   document.querySelectorAll('.quick-btn').forEach(b => b.classList.remove('active'));
+
   syncDateInputs();
   renderAll();
 }
